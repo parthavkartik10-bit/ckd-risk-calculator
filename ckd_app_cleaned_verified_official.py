@@ -240,6 +240,14 @@ div[data-testid="stSidebar"] .metric-card { background: rgba(255,255,255,0.96) !
 div[data-testid="stSidebar"] .metric-card * { color: #1A1A1A !important; }
 div[data-testid="stSidebar"] .metric-label { color: #4F5B66 !important; }
 div[data-testid="stSidebar"] .metric-value { color: #1F4E79 !important; }
+div[data-testid="stSidebar"] .sidebar-chart-label {
+    color: #F8FBFF !important;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin: 0.6rem 0 0.3rem 0;
+}
 
 /* Expander - force white background and dark text */
 div[data-testid="stExpander"] { background-color: white !important; }
@@ -509,7 +517,7 @@ def shap_waterfall_fig(explainer, model, x_input, feature_names, x_t=None):
             plt.close()
 
 
-def global_importance_fig(model, feature_names, color):
+def global_importance_fig(model, feature_names, color, title=None):
     clf = model.named_steps["clf"]
     fig, ax = plt.subplots(figsize=(4, max(3, len(feature_names) * 0.35)))
     fig.patch.set_facecolor("#1F4E79")
@@ -523,6 +531,8 @@ def global_importance_fig(model, feature_names, color):
     importances = np.asarray(clf.feature_importances_, dtype=float)
     idx = np.argsort(importances)
     ax.barh([feature_names[i] for i in idx], importances[idx], color=color, alpha=0.85)
+    if title:
+        ax.set_title(title, fontsize=9, color="white", pad=6)
     ax.set_xlabel("Importance", fontsize=8, color="white")
     ax.tick_params(colors="white", labelsize=7)
     for spine in ax.spines.values():
@@ -600,7 +610,8 @@ with st.sidebar:
     st.markdown('<div class="metric-card"><div class="metric-label">Test AUC</div><div class="metric-value">0.857</div></div>', unsafe_allow_html=True)
     st.markdown('<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">0.775 – 0.921</div></div>', unsafe_allow_html=True)
     st.markdown('<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">0.129</div></div>', unsafe_allow_html=True)
-    fig_a = global_importance_fig(model_A, feats_A, "#64B5F6")
+    st.markdown('<div class="sidebar-chart-label">Feature Importance (Model A)</div>', unsafe_allow_html=True)
+    fig_a = global_importance_fig(model_A, feats_A, "#64B5F6", "Model A Feature Importance")
     st.pyplot(fig_a, use_container_width=True)
     plt.close(fig_a)
 
@@ -610,7 +621,8 @@ with st.sidebar:
     st.markdown('<div class="metric-card"><div class="metric-label">Test AUC</div><div class="metric-value">0.867</div></div>', unsafe_allow_html=True)
     st.markdown('<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">0.798 – 0.923</div></div>', unsafe_allow_html=True)
     st.markdown('<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">0.125</div></div>', unsafe_allow_html=True)
-    fig_b = global_importance_fig(model_B, feats_B, "#4DB6AC")
+    st.markdown('<div class="sidebar-chart-label">Feature Importance (Model B)</div>', unsafe_allow_html=True)
+    fig_b = global_importance_fig(model_B, feats_B, "#4DB6AC", "Model B Feature Importance")
     st.pyplot(fig_b, use_container_width=True)
     plt.close(fig_b)
 
