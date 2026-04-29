@@ -3,11 +3,11 @@ CKD Progression Risk Calculator
 Streamlit clinical decision-support tool.
 Trained on T1DiabetesGranada dataset (713 patients).
 Models: Random Forest - Model A (8 vars) and Model B (14 vars).
-Pipeline v4.1 -- select-by auc, seed=42
 """
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import joblib
@@ -61,6 +61,48 @@ MODEL_B_REQUIRED = [
 RISK_LOW = 0.05
 RISK_MOD = 0.20
 
+DEFAULT_MODEL_B_OPERATING_POINTS = {
+    "Youden": {
+        "label": "Balanced (Youden)",
+        "threshold": 0.386,
+        "auc": 0.870,
+        "ci_low": 0.804,
+        "ci_high": 0.925,
+        "precision": 0.710,
+        "recall": 0.595,
+        "specificity": 0.915,
+        "f1": 0.647,
+    },
+    "Screening": {
+        "label": "Screening (High Sensitivity)",
+        "threshold": 0.180,
+        "auc": 0.870,
+        "ci_low": 0.804,
+        "ci_high": 0.925,
+        "precision": 0.532,
+        "recall": 0.892,
+        "specificity": 0.726,
+        "f1": 0.667,
+    },
+}
+
+DEFAULT_PERFORMANCE_SUMMARY = {
+    "Model A": {
+        "Algorithm": "Random Forest",
+        "AUC": 0.857,
+        "CI_low": 0.779,
+        "CI_high": 0.923,
+        "Brier": 0.121,
+    },
+    "Model B": {
+        "Algorithm": "Random Forest",
+        "AUC": 0.870,
+        "CI_low": 0.804,
+        "CI_high": 0.925,
+        "Brier": 0.122,
+    },
+}
+
 st.set_page_config(
     page_title="CKD Risk Calculator",
     page_icon=None,
@@ -106,7 +148,6 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
-    color: #1A1A1A !important;
 }
 .risk-moderate {
     background: linear-gradient(135deg, #FFF3CD, #FFEEBA);
@@ -114,7 +155,6 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
-    color: #1A1A1A !important;
 }
 .risk-high {
     background: linear-gradient(135deg, #F8D7DA, #F5C6CB);
@@ -122,7 +162,6 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
-    color: #1A1A1A !important;
 }
 .risk-title {
     font-size: 1.4rem;
@@ -160,7 +199,7 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #6C757D !important;
+    color: #6C757D;
     margin-bottom: 0.8rem;
 }
 .driver-item {
@@ -168,13 +207,57 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     align-items: center;
     padding: 0.4rem 0;
     font-size: 0.95rem;
-    color: #1A1A1A !important;
     border-bottom: 1px solid #F0F0F0;
 }
-.driver-item * { color: inherit !important; }
 .driver-item:last-child { border-bottom: none; }
-.driver-up { color: #DC3545 !important; font-weight: 700; margin-right: 0.5rem; }
-.driver-down { color: #28A745 !important; font-weight: 700; margin-right: 0.5rem; }
+.driver-up { color: #DC3545; font-weight: 700; margin-right: 0.5rem; }
+.driver-down { color: #28A745; font-weight: 700; margin-right: 0.5rem; }
+
+.op-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.op-positive {
+    border-left: 5px solid #E67E22;
+    background: linear-gradient(135deg, #FFF4E5, #FFE8CC);
+}
+.op-negative {
+    border-left: 5px solid #2E7D32;
+    background: linear-gradient(135deg, #EDF7EE, #DDF1E1);
+}
+.op-kicker {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6C757D;
+    margin-bottom: 0.35rem;
+}
+.op-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1F4E79;
+    margin-bottom: 0.2rem;
+}
+.op-meta {
+    font-size: 0.9rem;
+    color: #4F5B66;
+    line-height: 1.45;
+    margin-top: 0.2rem;
+}
+.mode-note {
+    background: white;
+    border: 1px solid #E3E9EF;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin: 0.75rem 0 1rem 0;
+    color: #4F5B66;
+    font-size: 0.88rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
 
 .metric-card {
     background: white;
@@ -214,7 +297,7 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.2px;
-    color: #6C757D !important;
+    color: #6C757D;
     margin: 1.5rem 0 0.8rem 0;
     padding-bottom: 0.4rem;
     border-bottom: 2px solid #E9ECEF;
@@ -233,86 +316,31 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     font-size: 0.9rem;
 }
 
-/* Sidebar theme - force ALL text white */
-div[data-testid="stSidebar"] { background: #1F4E79; }
-div[data-testid="stSidebar"] * { color: white !important; }
-div[data-testid="stSidebar"] .metric-card { background: rgba(255,255,255,0.96) !important; border-left-color: #4DB6AC !important; }
-div[data-testid="stSidebar"] .metric-card * { color: #1A1A1A !important; }
-div[data-testid="stSidebar"] .metric-label { color: #4F5B66 !important; }
-div[data-testid="stSidebar"] .metric-value { color: #1F4E79 !important; }
-div[data-testid="stSidebar"] .sidebar-chart-label {
-    color: #F8FBFF !important;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    margin: 0.6rem 0 0.3rem 0;
-}
-
-/* Expander - force white background and dark text */
-div[data-testid="stExpander"] { background-color: white !important; }
-div[data-testid="stExpander"] > details { background-color: white !important; }
-div[data-testid="stExpander"] > details > summary { color: #1A1A1A !important; background: white !important; }
-div[data-testid="stExpander"] > details > div { background-color: white !important; color: #1A1A1A !important; }
-div[data-testid="stExpander"] details summary span { color: #1A1A1A !important; }
-div[data-testid="stExpander"] details > div * { color: #1A1A1A !important; background-color: white !important; }
-[data-testid="stExpanderDetails"] { background-color: white !important; color: #1A1A1A !important; }
-[data-testid="stExpanderDetails"] * { color: #1A1A1A !important; }
-
-/* Main content only - force dark text */
-[data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] p,
-[data-testid="stAppViewContainer"] .main [data-testid="stMarkdownContainer"] strong,
-[data-testid="stAppViewContainer"] .main [data-testid="stWidgetLabel"] p,
-[data-testid="stAppViewContainer"] .main [data-testid="stWidgetLabel"] span,
-[data-testid="stAppViewContainer"] .main label {
-    color: #1A1A1A !important;
-}
-
-/* Streamlit main section fallback selectors */
-section[data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
-section[data-testid="stMain"] [data-testid="stMarkdownContainer"] strong,
-section[data-testid="stMain"] [data-testid="stWidgetLabel"] p,
-section[data-testid="stMain"] [data-testid="stWidgetLabel"] span,
-section[data-testid="stMain"] label,
-section[data-testid="stMain"] li,
-section[data-testid="stMain"] span {
-    color: #1A1A1A !important;
-}
-section[data-testid="stMain"] .stTabs [data-baseweb="tab"] {
-    color: #1A1A1A !important;
-}
-section[data-testid="stMain"] .stTabs [data-baseweb="tab"][aria-selected="true"] {
-    color: #E53935 !important;
-}
-
-/* Sidebar markdown text must stay light for contrast */
+/* Sidebar theme */
+section[data-testid="stSidebar"], div[data-testid="stSidebar"] { background: #1F4E79 !important; }
+section[data-testid="stSidebar"] *, div[data-testid="stSidebar"] * { color: #F8FBFF !important; }
 [data-testid="stSidebarUserContent"] .stMarkdown,
 [data-testid="stSidebarUserContent"] .stMarkdown *,
 [data-testid="stSidebarUserContent"] p,
 [data-testid="stSidebarUserContent"] li,
 [data-testid="stSidebarUserContent"] span,
 [data-testid="stSidebarUserContent"] strong,
-[data-testid="stSidebarUserContent"] a,
 [data-testid="stSidebarUserContent"] h1,
 [data-testid="stSidebarUserContent"] h2,
 [data-testid="stSidebarUserContent"] h3,
 [data-testid="stSidebarUserContent"] h4,
 [data-testid="stSidebarUserContent"] h5,
-[data-testid="stSidebarUserContent"] h6 {
+[data-testid="stSidebarUserContent"] h6,
+[data-testid="stSidebarUserContent"] a {
     color: #F8FBFF !important;
 }
-
-/* Keep metric-card text dark for readability on light cards */
-[data-testid="stSidebarUserContent"] .metric-card,
-[data-testid="stSidebarUserContent"] .metric-card * {
-    color: #1A1A1A !important;
+div[data-testid="stSidebar"] .metric-card * { color: inherit !important; }
+div[data-testid="stSidebar"] .metric-card {
+    background: rgba(255,255,255,0.96) !important;
+    border-left-color: #4DB6AC !important;
 }
-[data-testid="stSidebarUserContent"] .metric-card .metric-label {
-    color: #4F5B66 !important;
-}
-[data-testid="stSidebarUserContent"] .metric-card .metric-value {
-    color: #1F4E79 !important;
-}
+div[data-testid="stSidebar"] .metric-label { color: #4F5B66 !important; }
+div[data-testid="stSidebar"] .metric-value { color: #1F4E79 !important; }
 </style>
 """,
     unsafe_allow_html=True,
@@ -370,8 +398,107 @@ def load_models():
     return model_A, feats_A, model_B, feats_B
 
 
+@st.cache_data(show_spinner=False)
+def load_model_b_operating_points():
+    points = {k: v.copy() for k, v in DEFAULT_MODEL_B_OPERATING_POINTS.items()}
+    csv_path = BASE / "modelB_rf_operating_points.csv"
+    if not csv_path.exists():
+        return points
+
+    try:
+        df = pd.read_csv(csv_path)
+        required_cols = {
+            "Operating_Point",
+            "Model",
+            "Algorithm",
+            "Threshold",
+            "AUC",
+            "CI_low",
+            "CI_high",
+            "Precision",
+            "Recall",
+            "Specificity",
+            "F1",
+        }
+        if not required_cols.issubset(df.columns):
+            return points
+
+        df = df[(df["Model"] == "Model B") & (df["Algorithm"] == "Random Forest")]
+        for _, row in df.iterrows():
+            key = str(row["Operating_Point"]).strip()
+            if key not in points:
+                continue
+            points[key].update(
+                {
+                    "threshold": float(row["Threshold"]),
+                    "auc": float(row["AUC"]),
+                    "ci_low": float(row["CI_low"]),
+                    "ci_high": float(row["CI_high"]),
+                    "precision": float(row["Precision"]),
+                    "recall": float(row["Recall"]),
+                    "specificity": float(row["Specificity"]),
+                    "f1": float(row["F1"]),
+                }
+            )
+    except Exception:
+        return points
+
+    return points
+
+
+@st.cache_data(show_spinner=False)
+def load_performance_summary():
+    summary = {k: v.copy() for k, v in DEFAULT_PERFORMANCE_SUMMARY.items()}
+    csv_path = BASE / "performance_comparison.csv"
+    if not csv_path.exists():
+        return summary
+
+    try:
+        df = pd.read_csv(csv_path)
+        required_cols = {"Model", "Algorithm", "AUC", "CI_low", "CI_high", "Brier"}
+        if not required_cols.issubset(df.columns):
+            return summary
+
+        for model_label in ["Model A", "Model B"]:
+            algo = summary[model_label]["Algorithm"]
+            match = df[(df["Model"] == model_label) & (df["Algorithm"] == algo)]
+            if match.empty:
+                continue
+            row = match.iloc[0]
+            summary[model_label].update(
+                {
+                    "AUC": float(row["AUC"]),
+                    "CI_low": float(row["CI_low"]),
+                    "CI_high": float(row["CI_high"]),
+                    "Brier": float(row["Brier"]),
+                }
+            )
+    except Exception:
+        return summary
+
+    return summary
+
+
+@st.cache_data(show_spinner=False)
+def load_app_metadata():
+    metadata_path = BASE / "app_model_metadata.json"
+    if not metadata_path.exists():
+        raise FileNotFoundError("Missing app_model_metadata.json. Run the pipeline with --research-safe first.")
+
+    with metadata_path.open("r", encoding="utf-8") as f:
+        metadata = json.load(f)
+
+    if not metadata.get("research_safe", False):
+        raise ValueError("app_model_metadata.json indicates the current app artifacts are not research-safe.")
+
+    return metadata
+
+
 try:
     model_A, feats_A, model_B, feats_B = load_models()
+    app_metadata = load_app_metadata()
+    model_B_operating_points = load_model_b_operating_points()
+    perf_summary = load_performance_summary()
     _validate_pipeline(model_A, "Model A")
     _validate_pipeline(model_B, "Model B")
     _validate_feature_contract(model_A, feats_A, MODEL_A_REQUIRED, "Model A")
@@ -380,17 +507,16 @@ except Exception as exc:
     st.error(
         "Failed to load/validate model artifacts.\n\n"
         f"Details: {type(exc).__name__}: {exc}\n\n"
-        "Place ckd_model_A.pkl, ckd_features_A.pkl, ckd_model_B.pkl, ckd_features_B.pkl next to this app."
+        "Run ckd_ml_pipeline.py with --research-safe to generate the app artifacts and metadata next to this app."
     )
     st.stop()
 
 
-# FIX: underscore prefix on _model tells Streamlit not to hash the sklearn Pipeline
 @st.cache_resource(show_spinner="Preparing SHAP explainers...")
-def get_explainer(_model):
+def get_explainer(model):
     if not SHAP_AVAILABLE:
         return None
-    return shap.TreeExplainer(_model.named_steps["clf"])
+    return shap.TreeExplainer(model.named_steps["clf"])
 
 
 explainer_A = get_explainer(model_A)
@@ -500,6 +626,8 @@ def shap_waterfall_fig(explainer, model, x_input, feature_names, x_t=None):
         shap_out = _compute_shap_output(explainer, x_t)
         sv = _extract_shap_row(shap_out)
         base = _extract_base_value(explainer, shap_out)
+        # Intentional: SHAP values are computed on transformed features (x_t),
+        # but waterfall display shows raw patient inputs for clinical readability.
         exp = shap.Explanation(
             values=sv,
             base_values=base,
@@ -517,7 +645,7 @@ def shap_waterfall_fig(explainer, model, x_input, feature_names, x_t=None):
             plt.close()
 
 
-def global_importance_fig(model, feature_names, color, title=None):
+def global_importance_fig(model, feature_names, color):
     clf = model.named_steps["clf"]
     fig, ax = plt.subplots(figsize=(4, max(3, len(feature_names) * 0.35)))
     fig.patch.set_facecolor("#1F4E79")
@@ -531,8 +659,6 @@ def global_importance_fig(model, feature_names, color, title=None):
     importances = np.asarray(clf.feature_importances_, dtype=float)
     idx = np.argsort(importances)
     ax.barh([feature_names[i] for i in idx], importances[idx], color=color, alpha=0.85)
-    if title:
-        ax.set_title(title, fontsize=9, color="white", pad=6)
     ax.set_xlabel("Importance", fontsize=8, color="white")
     ax.tick_params(colors="white", labelsize=7)
     for spine in ax.spines.values():
@@ -580,55 +706,80 @@ def _render_drivers_and_shap(drivers, drivers_err, fig, fig_err):
     elif drivers_err:
         st.info(f"SHAP drivers unavailable: {drivers_err}")
 
-    with st.expander("📊 Why did the model give this score? (click to expand)"):
-        st.markdown(
-            """
-<div style="background:#F0F4F8;border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem;color:#1A1A1A;">
-<strong style="color:#1F4E79;">How to read this chart:</strong><br><br>
-Each bar shows how much a specific measurement <em>pushed the risk score up or down</em> for this patient.<br><br>
-<span style="color:#DC3545;font-weight:600;">Red bars →</span> this value <strong>increased</strong> the predicted risk.<br>
-<span style="color:#2E75B6;font-weight:600;">Blue bars →</span> this value <strong>decreased</strong> the predicted risk.<br><br>
-Longer bars = bigger impact on the score. The starting point (base value) is the average risk across all patients in the training data.
-</div>
-""",
-            unsafe_allow_html=True,
-        )
+    with st.expander("SHAP Explanation (Feature Contributions)"):
         if fig is not None:
             st.pyplot(fig, use_container_width=True)
             plt.close(fig)
         elif fig_err:
-            st.info(f"Chart unavailable: {fig_err}")
+            st.info(f"SHAP plot unavailable: {fig_err}")
         else:
-            st.info("Chart unavailable for this input.")
+            st.info("SHAP plot unavailable for this input.")
+
+
+def _render_operating_point_call(prob, point_key, point):
+    positive = prob >= point["threshold"]
+    css_class = "op-card op-positive" if positive else "op-card op-negative"
+    decision = "Screen Positive" if positive else "Screen Negative"
+    emphasis = (
+        "Sensitivity-focused threshold intended to catch more future CKD cases."
+        if point_key == "Screening"
+        else "Balanced threshold intended to reduce unnecessary false alarms."
+    )
+    st.markdown(
+        f"""
+<div class="{css_class}">
+  <div class="op-kicker">{point['label']}</div>
+  <div class="op-title">{decision} at {point['threshold']*100:.1f}% threshold</div>
+  <div class="op-meta">This patient's predicted risk is {prob*100:.1f}%, which is {'above' if positive else 'below'} the selected cutoff.</div>
+  <div class="op-meta">Validated recall {point['recall']*100:.1f}%, specificity {point['specificity']*100:.1f}%, precision {point['precision']*100:.1f}%.</div>
+  <div class="op-meta">{emphasis}</div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
 
 with st.sidebar:
     st.markdown("### Model Performance")
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">Artifact Mode</div><div class="metric-value">RESEARCH-SAFE</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">Exported</div><div class="metric-value">{app_metadata["generated_at_utc"][:10]}</div></div>',
+        unsafe_allow_html=True,
+    )
 
     st.markdown("**Model A - Minimal**")
-    st.markdown("8 predictors · Random Forest")
-    st.markdown('<div class="metric-card"><div class="metric-label">Test AUC</div><div class="metric-value">0.857</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">0.775 – 0.921</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">0.129</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-chart-label">Feature Importance (Model A)</div>', unsafe_allow_html=True)
-    fig_a = global_importance_fig(model_A, feats_A, "#64B5F6", "Model A Feature Importance")
+    st.markdown("8 predictors")
+    st.markdown(f'<div class="metric-card"><div class="metric-label">AUC</div><div class="metric-value">{perf_summary["Model A"]["AUC"]:.3f}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">{perf_summary["Model A"]["CI_low"]:.3f} - {perf_summary["Model A"]["CI_high"]:.3f}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">{perf_summary["Model A"]["Brier"]:.3f}</div></div>', unsafe_allow_html=True)
+    fig_a = global_importance_fig(model_A, feats_A, "#64B5F6")
     st.pyplot(fig_a, use_container_width=True)
     plt.close(fig_a)
 
     st.markdown("---")
-    st.markdown("**Model B - Standard ★ Primary**")
-    st.markdown("14 predictors · Random Forest")
-    st.markdown('<div class="metric-card"><div class="metric-label">Test AUC</div><div class="metric-value">0.867</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">0.798 – 0.923</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">0.125</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-chart-label">Feature Importance (Model B)</div>', unsafe_allow_html=True)
-    fig_b = global_importance_fig(model_B, feats_B, "#4DB6AC", "Model B Feature Importance")
+    st.markdown("**Model B - Standard**")
+    st.markdown("14 predictors")
+    st.markdown(f'<div class="metric-card"><div class="metric-label">AUC</div><div class="metric-value">{perf_summary["Model B"]["AUC"]:.3f}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">{perf_summary["Model B"]["CI_low"]:.3f} - {perf_summary["Model B"]["CI_high"]:.3f}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">{perf_summary["Model B"]["Brier"]:.3f}</div></div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">Balanced Recall / Specificity</div><div class="metric-value">{model_B_operating_points["Youden"]["recall"]*100:.1f}% / {model_B_operating_points["Youden"]["specificity"]*100:.1f}%</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">Screening Recall / Specificity</div><div class="metric-value">{model_B_operating_points["Screening"]["recall"]*100:.1f}% / {model_B_operating_points["Screening"]["specificity"]*100:.1f}%</div></div>',
+        unsafe_allow_html=True,
+    )
+    fig_b = global_importance_fig(model_B, feats_B, "#4DB6AC")
     st.pyplot(fig_b, use_container_width=True)
     plt.close(fig_b)
 
     st.markdown("---")
     st.markdown("**Dataset**")
-    st.markdown("- 713 T1D patients\n- Granada, Spain\n- 25.5% CKD positive\n- Pipeline v4.1, seed=42")
+    st.markdown("- 713 T1D patients\n- Granada, Spain\n- 25.5% CKD positive\n- Random Forest (500 trees)")
     st.markdown(
         '<div class="disclaimer" style="background:rgba(255,255,200,0.15);border-color:rgba(255,255,200,0.3);color:rgba(255,255,255,0.85)">Research tool only. Not a substitute for clinical judgment. Not validated for clinical deployment.</div>',
         unsafe_allow_html=True,
@@ -656,9 +807,7 @@ with tab_A:
 
     with col_in:
         st.markdown('<div class="section-header">Patient Demographics</div>', unsafe_allow_html=True)
-        a_age = st.slider("Age (years)", 13, 90, 45, key="a_age")
-        if a_age > 82:
-            st.warning("Age > 82 is outside the training data range. Predictions may be less reliable.")
+        a_age = st.slider("Age (years)", 13, 82, 45, key="a_age")
         a_sex = st.selectbox("Sex", ["Female", "Male"], key="a_sex")
         a_dur = st.slider("Diabetes Duration (years)", 0, 60, 15, key="a_dur")
 
@@ -722,13 +871,33 @@ with tab_A:
 
 with tab_B:
     st.markdown("**Use when full metabolic panel is available.** Primary model.")
+    model_b_mode_labels = {
+        "Balanced (Youden)": "Youden",
+        "Screening (High Sensitivity)": "Screening",
+    }
+    selected_b_mode_label = st.radio(
+        "Clinical operating point",
+        list(model_b_mode_labels.keys()),
+        index=1,
+        horizontal=True,
+        help="Same Random Forest model and AUC; only the decision threshold changes.",
+    )
+    selected_b_mode_key = model_b_mode_labels[selected_b_mode_label]
+    selected_b_mode = model_B_operating_points[selected_b_mode_key]
+    st.markdown(
+        f"""
+<div class="mode-note">
+  <strong>{selected_b_mode['label']}</strong>: threshold {selected_b_mode['threshold']*100:.1f}% | validated recall {selected_b_mode['recall']*100:.1f}% | specificity {selected_b_mode['specificity']*100:.1f}%.
+  Risk bands (low/moderate/high) show absolute risk, while the operating point determines whether the patient is considered screen positive.
+</div>
+""",
+        unsafe_allow_html=True,
+    )
     col_in2, col_out2 = st.columns([1, 1], gap="large")
 
     with col_in2:
         st.markdown('<div class="section-header">Patient Demographics</div>', unsafe_allow_html=True)
-        b_age = st.slider("Age (years)", 13, 90, 45, key="b_age")
-        if b_age > 82:
-            st.warning("Age > 82 is outside the training data range. Predictions may be less reliable.")
+        b_age = st.slider("Age (years)", 13, 82, 45, key="b_age")
         b_sex = st.selectbox("Sex", ["Female", "Male"], key="b_sex")
         b_dur = st.slider("Diabetes Duration (years)", 0, 60, 15, key="b_dur")
 
@@ -805,6 +974,7 @@ with tab_B:
                 st.stop()
 
             _render_risk(prob, ci_low, ci_high, cat, css, emoji)
+            _render_operating_point_call(prob, selected_b_mode_key, selected_b_mode)
             drivers, derr = get_shap_drivers(explainer_B, model_B, x_in, feats_B, x_t=x_t)
             fig, ferr = shap_waterfall_fig(explainer_B, model_B, x_in, feats_B, x_t=x_t)
             _render_drivers_and_shap(drivers, derr, fig, ferr)
