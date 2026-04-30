@@ -1,0 +1,10 @@
+Model,Algorithm,Selected_By_CV,CV_AUC_Mean,AUC,CI_low,CI_high,Threshold,Brier,Precision,Recall,Specificity,F1
+Model A,Random Forest,Yes,0.842,0.857,0.779,0.923,0.417,0.121,0.75,0.568,0.934,0.646
+Model A,Logistic Regression,No,0.837,0.847,0.746,0.921,0.26,0.114,0.591,0.703,0.83,0.642
+Model A,XGBoost,No,0.81,0.818,0.731,0.899,0.214,0.129,0.564,0.595,0.84,0.579
+Model B,Random Forest,Yes,0.836,0.87,0.804,0.925,0.386,0.122,0.71,0.595,0.915,0.647
+Model B,Logistic Regression,No,0.826,0.849,0.765,0.923,0.241,0.112,0.553,0.703,0.802,0.619
+Model B,XGBoost,No,0.82,0.837,0.747,0.913,0.214,0.12,0.641,0.676,0.868,0.658
+Model C,Random Forest,Yes,0.835,0.872,0.804,0.931,0.379,0.119,0.733,0.595,0.925,0.657
+Model C,Logistic Regression,No,0.824,0.849,0.759,0.923,0.24,0.114,0.543,0.676,0.802,0.602
+Model C,XGBoost,No,0.818,0.847,0.759,0.92,0.335,0.117,0.719,0.622,0.915,0.667
