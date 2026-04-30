@@ -123,21 +123,23 @@ html, body, [class*="css"] {
 h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
 
 .title-block {
-    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #EAF2FB 100%);
     padding: 2rem 2.5rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
-    color: white;
+    border: 1px solid #D6E4F0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    color: #1F2933;
 }
 .title-block h1 {
-    color: white;
+    color: #1F2933;
     font-size: 2rem;
     font-weight: 700;
     margin: 0 0 0.3rem 0;
     letter-spacing: -0.5px;
 }
 .title-block p {
-    color: rgba(255,255,255,0.88);
+    color: #4F5B66;
     font-size: 0.95rem;
     margin: 0;
 }
@@ -148,6 +150,7 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
+    color: #1F2933;
 }
 .risk-moderate {
     background: linear-gradient(135deg, #FFF3CD, #FFEEBA);
@@ -155,6 +158,7 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
+    color: #1F2933;
 }
 .risk-high {
     background: linear-gradient(135deg, #F8D7DA, #F5C6CB);
@@ -162,6 +166,12 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     border-radius: 8px;
     padding: 1.5rem 2rem;
     margin: 1rem 0;
+    color: #1F2933;
+}
+.risk-low *,
+.risk-moderate *,
+.risk-high * {
+    color: #1F2933 !important;
 }
 .risk-title {
     font-size: 1.4rem;
@@ -193,6 +203,7 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     padding: 1.2rem 1.5rem;
     margin: 1rem 0;
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    color: #1F2933;
 }
 .driver-title {
     font-size: 0.85rem;
@@ -208,8 +219,14 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     padding: 0.4rem 0;
     font-size: 0.95rem;
     border-bottom: 1px solid #F0F0F0;
+    color: #1F2933;
 }
 .driver-item:last-child { border-bottom: none; }
+.driver-box *,
+.driver-item *,
+.driver-title * {
+    color: #1F2933 !important;
+}
 .driver-up { color: #DC3545; font-weight: 700; margin-right: 0.5rem; }
 .driver-down { color: #28A745; font-weight: 700; margin-right: 0.5rem; }
 
@@ -314,33 +331,115 @@ h1, h2, h3 { font-family: 'IBM Plex Sans', sans-serif; }
     border-radius: 7px;
     font-weight: 600;
     font-size: 0.9rem;
+    color: #1F2933 !important;
+}
+.stTabs [aria-selected="true"] {
+    color: #FF5A5F !important;
 }
 
 /* Sidebar theme */
-section[data-testid="stSidebar"], div[data-testid="stSidebar"] { background: #1F4E79 !important; }
-section[data-testid="stSidebar"] *, div[data-testid="stSidebar"] * { color: #F8FBFF !important; }
-[data-testid="stSidebarUserContent"] .stMarkdown,
-[data-testid="stSidebarUserContent"] .stMarkdown *,
-[data-testid="stSidebarUserContent"] p,
-[data-testid="stSidebarUserContent"] li,
-[data-testid="stSidebarUserContent"] span,
-[data-testid="stSidebarUserContent"] strong,
-[data-testid="stSidebarUserContent"] h1,
-[data-testid="stSidebarUserContent"] h2,
-[data-testid="stSidebarUserContent"] h3,
-[data-testid="stSidebarUserContent"] h4,
-[data-testid="stSidebarUserContent"] h5,
-[data-testid="stSidebarUserContent"] h6,
-[data-testid="stSidebarUserContent"] a {
-    color: #F8FBFF !important;
+section[data-testid="stSidebar"], div[data-testid="stSidebar"] {
+    background: #F7FAFC !important;
+    border-right: 1px solid #D6E4F0;
 }
-div[data-testid="stSidebar"] .metric-card * { color: inherit !important; }
+[data-testid="stSidebarUserContent"],
+[data-testid="stSidebarUserContent"] * {
+    color: #1F2933 !important;
+}
+div[data-testid="stSidebar"] label,
+div[data-testid="stSidebar"] [data-testid="stWidgetLabel"] *,
+div[data-testid="stSidebar"] .stRadio p,
+div[data-testid="stSidebar"] .stSlider [data-testid="stTickBarMin"],
+div[data-testid="stSidebar"] .stSlider [data-testid="stTickBarMax"],
+div[data-testid="stSidebar"] .stSlider [data-testid="stThumbValue"] {
+    color: #1F2933 !important;
+}
+div[data-testid="stSidebar"] [data-baseweb="select"] > div,
+div[data-testid="stSidebar"] [data-baseweb="base-input"] > div,
+div[data-testid="stSidebar"] [data-baseweb="input"] > div,
+div[data-testid="stSidebar"] input,
+div[data-testid="stSidebar"] textarea {
+    background: #FFFFFF !important;
+    color: #1F2933 !important;
+}
+div[data-testid="stSidebar"] [data-baseweb="select"] span,
+div[data-testid="stSidebar"] [data-baseweb="select"] input {
+    color: #1F2933 !important;
+}
 div[data-testid="stSidebar"] .metric-card {
-    background: rgba(255,255,255,0.96) !important;
-    border-left-color: #4DB6AC !important;
+    background: rgba(255,255,255,0.98) !important;
+    border-left-color: #2E75B6 !important;
+    color: #1F2933 !important;
+}
+div[data-testid="stSidebar"] .metric-card *,
+div[data-testid="stSidebar"] .metric-card div,
+div[data-testid="stSidebar"] .metric-card p,
+div[data-testid="stSidebar"] .metric-card span {
+    color: #1F2933 !important;
 }
 div[data-testid="stSidebar"] .metric-label { color: #4F5B66 !important; }
 div[data-testid="stSidebar"] .metric-value { color: #1F4E79 !important; }
+
+/* Main widget readability */
+[data-testid="stAppViewContainer"] label,
+[data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] *,
+[data-testid="stAppViewContainer"] .stRadio p,
+[data-testid="stAppViewContainer"] .stSelectbox label,
+[data-testid="stAppViewContainer"] .stSlider label,
+[data-testid="stAppViewContainer"] .stSlider [data-testid="stTickBarMin"],
+[data-testid="stAppViewContainer"] .stSlider [data-testid="stTickBarMax"],
+[data-testid="stAppViewContainer"] .stSlider [data-testid="stThumbValue"] {
+    color: #1F2933 !important;
+}
+[data-testid="stAppViewContainer"] [data-baseweb="select"] > div,
+[data-testid="stAppViewContainer"] [data-baseweb="base-input"] > div,
+[data-testid="stAppViewContainer"] [data-baseweb="input"] > div,
+[data-testid="stAppViewContainer"] input,
+[data-testid="stAppViewContainer"] textarea {
+    background: #FFFFFF !important;
+    color: #1F2933 !important;
+}
+[data-testid="stAppViewContainer"] [data-baseweb="select"] span,
+[data-testid="stAppViewContainer"] [data-baseweb="select"] input {
+    color: #1F2933 !important;
+}
+
+/* Dropdown menu readability */
+div[role="listbox"],
+ul[role="listbox"] {
+    background: #FFFFFF !important;
+    color: #1F2933 !important;
+}
+div[role="option"],
+li[role="option"] {
+    background: #FFFFFF !important;
+    color: #1F2933 !important;
+}
+div[role="option"] *,
+li[role="option"] * {
+    color: #1F2933 !important;
+}
+[data-baseweb="popover"] {
+    background: #FFFFFF !important;
+    color: #1F2933 !important;
+}
+[data-baseweb="select"] {
+    color: #1F2933 !important;
+}
+
+/* Expander readability */
+[data-testid="stExpander"] {
+    background: #FFFFFF !important;
+    border: 1px solid #E3E9EF !important;
+    border-radius: 8px !important;
+}
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary *,
+[data-testid="stExpander"] details,
+[data-testid="stExpander"] details * {
+    color: #1F2933 !important;
+}
+
 </style>
 """,
     unsafe_allow_html=True,
@@ -513,10 +612,10 @@ except Exception as exc:
 
 
 @st.cache_resource(show_spinner="Preparing SHAP explainers...")
-def get_explainer(model):
+def get_explainer(_model):
     if not SHAP_AVAILABLE:
         return None
-    return shap.TreeExplainer(model.named_steps["clf"])
+    return shap.TreeExplainer(_model.named_steps["clf"])
 
 
 explainer_A = get_explainer(model_A)
@@ -681,12 +780,12 @@ def _render_risk(prob, ci_low, ci_high, category, css_class, emoji_html):
     st.markdown(
         f"""
 <div class="{css_class}">
-  <div class="risk-title">{emoji_html} {category} Risk</div>
-  <div class="risk-prob">{prob*100:.1f}%</div>
-  <div class="risk-ci">95% CI: {ci_low*100:.1f}% - {ci_high*100:.1f}%
+  <div class="risk-title" style="color:#1F2933 !important;">{emoji_html} {category} Risk</div>
+  <div class="risk-prob" style="color:#1F2933 !important;">{prob*100:.1f}%</div>
+  <div class="risk-ci" style="color:#1F2933 !important;">95% CI: {ci_low*100:.1f}% - {ci_high*100:.1f}%
     <span title="Estimated from variation across all RF trees. Wider interval indicates higher uncertainty for this input profile." style="cursor:help;margin-left:4px;opacity:0.75">&#9432;</span>
   </div>
-  <div class="risk-action">{action}</div>
+  <div class="risk-action" style="color:#1F2933 !important;">{action}</div>
 </div>
 """,
         unsafe_allow_html=True,
@@ -695,6 +794,17 @@ def _render_risk(prob, ci_low, ci_high, category, css_class, emoji_html):
 
 
 def _render_drivers_and_shap(drivers, drivers_err, fig, fig_err):
+    st.markdown(
+        """
+<div style="background:#FFFFFF;border:1px solid #E3E9EF;border-radius:8px;padding:0.9rem 1rem;margin:0.8rem 0 1rem 0;color:#4F5B66;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+  <div style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6C757D;margin-bottom:0.35rem;">How To Read SHAP</div>
+  <div style="font-size:0.92rem;line-height:1.55;color:#4F5B66;">
+    SHAP explains why the model gave this patient's risk score. Features with positive contributions push the prediction higher, while negative contributions push it lower. Larger absolute values mean that feature had a stronger influence on this patient's prediction. SHAP describes how the model used the data; it does not prove that a feature directly caused CKD.
+  </div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
     if drivers:
         html = '<div class="driver-box"><div class="driver-title">Top Risk Drivers for This Patient</div>'
         for feat, val in drivers:
@@ -707,6 +817,10 @@ def _render_drivers_and_shap(drivers, drivers_err, fig, fig_err):
         st.info(f"SHAP drivers unavailable: {drivers_err}")
 
     with st.expander("SHAP Explanation (Feature Contributions)"):
+        st.markdown(
+            "<div style=\"color:#4F5B66;font-size:0.92rem;line-height:1.55;margin-bottom:0.75rem;\">The waterfall plot starts from the model's baseline prediction and shows how each feature moves the risk up or down until it reaches the final patient-specific prediction.</div>",
+            unsafe_allow_html=True,
+        )
         if fig is not None:
             st.pyplot(fig, use_container_width=True)
             plt.close(fig)
@@ -725,6 +839,18 @@ def _render_operating_point_call(prob, point_key, point):
         if point_key == "Screening"
         else "Balanced threshold intended to reduce unnecessary false alarms."
     )
+    metrics_explainer = (
+        f"Recall means the model catches about {point['recall']*100:.1f}% of patients who later develop CKD; "
+        f"specificity means it correctly rules out about {point['specificity']*100:.1f}% of patients who do not; "
+        f"precision means about {point['precision']*100:.1f}% of patients flagged positive truly go on to develop CKD."
+    )
+    cutoff_explainer = (
+        "Because this patient's score is below the selected threshold, the model would not flag them as screen positive at this operating point. "
+        "This does not mean zero risk; it means the predicted risk is below the cutoff chosen for action."
+        if not positive
+        else "Because this patient's score is above the selected threshold, the model would flag them as screen positive at this operating point. "
+        "This does not confirm CKD; it means the predicted risk is high enough to justify closer follow-up under this screening setting."
+    )
     st.markdown(
         f"""
 <div class="{css_class}">
@@ -732,6 +858,8 @@ def _render_operating_point_call(prob, point_key, point):
   <div class="op-title">{decision} at {point['threshold']*100:.1f}% threshold</div>
   <div class="op-meta">This patient's predicted risk is {prob*100:.1f}%, which is {'above' if positive else 'below'} the selected cutoff.</div>
   <div class="op-meta">Validated recall {point['recall']*100:.1f}%, specificity {point['specificity']*100:.1f}%, precision {point['precision']*100:.1f}%.</div>
+  <div class="op-meta">{metrics_explainer}</div>
+  <div class="op-meta">{cutoff_explainer}</div>
   <div class="op-meta">{emphasis}</div>
 </div>
 """,
@@ -739,49 +867,72 @@ def _render_operating_point_call(prob, point_key, point):
     )
 
 
-with st.sidebar:
-    st.markdown("### Model Performance")
+def _render_sidebar_heading(text):
     st.markdown(
-        f'<div class="metric-card"><div class="metric-label">Artifact Mode</div><div class="metric-value">RESEARCH-SAFE</div></div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f'<div class="metric-card"><div class="metric-label">Exported</div><div class="metric-value">{app_metadata["generated_at_utc"][:10]}</div></div>',
+        f'<div style="color:#1F2933;font-size:1.05rem;font-weight:700;margin:0.2rem 0 0.6rem 0;">{text}</div>',
         unsafe_allow_html=True,
     )
 
-    st.markdown("**Model A - Minimal**")
-    st.markdown("8 predictors")
-    st.markdown(f'<div class="metric-card"><div class="metric-label">AUC</div><div class="metric-value">{perf_summary["Model A"]["AUC"]:.3f}</div></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">{perf_summary["Model A"]["CI_low"]:.3f} - {perf_summary["Model A"]["CI_high"]:.3f}</div></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">{perf_summary["Model A"]["Brier"]:.3f}</div></div>', unsafe_allow_html=True)
+
+def _render_sidebar_text(text):
+    st.markdown(
+        f'<div style="color:#4F5B66;font-size:0.95rem;margin:0.15rem 0 0.45rem 0;">{text}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def _render_sidebar_metric_card(label, value):
+    st.caption(label)
+    st.markdown(
+        f"""
+<div style="background:#FFFFFF;border:1px solid #D6E4F0;border-left:4px solid #2E75B6;border-radius:8px;padding:0.65rem 0.8rem;margin:0 0 0.75rem 0;color:#1F2933;font-size:1rem;font-weight:700;font-family:'IBM Plex Mono', monospace;">
+  {value}
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+
+with st.sidebar:
+    _render_sidebar_heading("Model Performance")
+    _render_sidebar_metric_card("Artifact Mode", "RESEARCH-SAFE")
+    _render_sidebar_metric_card("Exported", app_metadata["generated_at_utc"][:10])
+
+    _render_sidebar_heading("Model A - Minimal")
+    _render_sidebar_text("8 predictors")
+    _render_sidebar_metric_card("AUC", f'{perf_summary["Model A"]["AUC"]:.3f}')
+    _render_sidebar_metric_card("95% CI", f'{perf_summary["Model A"]["CI_low"]:.3f} - {perf_summary["Model A"]["CI_high"]:.3f}')
+    _render_sidebar_metric_card("Brier Score", f'{perf_summary["Model A"]["Brier"]:.3f}')
     fig_a = global_importance_fig(model_A, feats_A, "#64B5F6")
     st.pyplot(fig_a, use_container_width=True)
     plt.close(fig_a)
 
     st.markdown("---")
-    st.markdown("**Model B - Standard**")
-    st.markdown("14 predictors")
-    st.markdown(f'<div class="metric-card"><div class="metric-label">AUC</div><div class="metric-value">{perf_summary["Model B"]["AUC"]:.3f}</div></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-card"><div class="metric-label">95% CI</div><div class="metric-value">{perf_summary["Model B"]["CI_low"]:.3f} - {perf_summary["Model B"]["CI_high"]:.3f}</div></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-card"><div class="metric-label">Brier Score</div><div class="metric-value">{perf_summary["Model B"]["Brier"]:.3f}</div></div>', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="metric-card"><div class="metric-label">Balanced Recall / Specificity</div><div class="metric-value">{model_B_operating_points["Youden"]["recall"]*100:.1f}% / {model_B_operating_points["Youden"]["specificity"]*100:.1f}%</div></div>',
-        unsafe_allow_html=True,
+    _render_sidebar_heading("Model B - Standard")
+    _render_sidebar_text("14 predictors")
+    _render_sidebar_metric_card("AUC", f'{perf_summary["Model B"]["AUC"]:.3f}')
+    _render_sidebar_metric_card("95% CI", f'{perf_summary["Model B"]["CI_low"]:.3f} - {perf_summary["Model B"]["CI_high"]:.3f}')
+    _render_sidebar_metric_card("Brier Score", f'{perf_summary["Model B"]["Brier"]:.3f}')
+    _render_sidebar_metric_card(
+        "Balanced Recall / Specificity",
+        f'{model_B_operating_points["Youden"]["recall"]*100:.1f}% / {model_B_operating_points["Youden"]["specificity"]*100:.1f}%',
     )
-    st.markdown(
-        f'<div class="metric-card"><div class="metric-label">Screening Recall / Specificity</div><div class="metric-value">{model_B_operating_points["Screening"]["recall"]*100:.1f}% / {model_B_operating_points["Screening"]["specificity"]*100:.1f}%</div></div>',
-        unsafe_allow_html=True,
+    _render_sidebar_metric_card(
+        "Screening Recall / Specificity",
+        f'{model_B_operating_points["Screening"]["recall"]*100:.1f}% / {model_B_operating_points["Screening"]["specificity"]*100:.1f}%',
     )
     fig_b = global_importance_fig(model_B, feats_B, "#4DB6AC")
     st.pyplot(fig_b, use_container_width=True)
     plt.close(fig_b)
 
     st.markdown("---")
-    st.markdown("**Dataset**")
-    st.markdown("- 713 T1D patients\n- Granada, Spain\n- 25.5% CKD positive\n- Random Forest (500 trees)")
+    _render_sidebar_heading("Dataset")
     st.markdown(
-        '<div class="disclaimer" style="background:rgba(255,255,200,0.15);border-color:rgba(255,255,200,0.3);color:rgba(255,255,255,0.85)">Research tool only. Not a substitute for clinical judgment. Not validated for clinical deployment.</div>',
+        '<div style="color:#4F5B66;font-size:0.95rem;line-height:1.6;">- 713 T1D patients<br>- Granada, Spain<br>- 25.5% CKD positive<br>- Random Forest (500 trees)</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div class="disclaimer" style="background:#FFF8E1;border-color:#FFE082;color:#5D4037">Research tool only. Not a substitute for clinical judgment. Not validated for clinical deployment.</div>',
         unsafe_allow_html=True,
     )
     if not SHAP_AVAILABLE:
@@ -802,7 +953,10 @@ st.markdown(
 tab_A, tab_B = st.tabs(["Model A - Minimal (8 variables)", "Model B - Standard (14 variables)"])
 
 with tab_A:
-    st.markdown("**Use when only basic labs are available.** Requires 8 variables.")
+    st.markdown(
+        '<div style="color:#1F2933;font-size:1rem;margin:0.1rem 0 1rem 0;"><strong style="color:#1F2933;">Use when only basic labs are available.</strong> <span style="color:#1F2933;">Requires 8 variables.</span></div>',
+        unsafe_allow_html=True,
+    )
     col_in, col_out = st.columns([1, 1], gap="large")
 
     with col_in:
@@ -866,11 +1020,14 @@ with tab_A:
             fig, ferr = shap_waterfall_fig(explainer_A, model_A, x_in, feats_A, x_t=x_t)
             _render_drivers_and_shap(drivers, derr, fig, ferr)
         else:
-            st.markdown('<div style="background:white;border-radius:10px;padding:3rem 2rem;text-align:center;color:#9DA8B5;margin-top:2rem;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:1rem;font-weight:600;">Enter patient values and click Predict</div><div style="font-size:0.85rem;margin-top:0.5rem">Risk score, uncertainty interval, and SHAP explanation will appear here</div></div>', unsafe_allow_html=True)
+            st.markdown('<div style="background:white;border-radius:10px;padding:3rem 2rem;text-align:center;color:#4F5B66;margin-top:2rem;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:1rem;font-weight:600;color:#4F5B66;">Enter patient values and click Predict</div><div style="font-size:0.85rem;margin-top:0.5rem;color:#6C757D;">Risk score, uncertainty interval, and SHAP explanation will appear here</div></div>', unsafe_allow_html=True)
 
 
 with tab_B:
-    st.markdown("**Use when full metabolic panel is available.** Primary model.")
+    st.markdown(
+        '<div style="color:#1F2933;font-size:1rem;margin:0.1rem 0 1rem 0;"><strong style="color:#1F2933;">Use when full metabolic panel is available.</strong> <span style="color:#1F2933;">Primary model.</span></div>',
+        unsafe_allow_html=True,
+    )
     model_b_mode_labels = {
         "Balanced (Youden)": "Youden",
         "Screening (High Sensitivity)": "Screening",
@@ -889,6 +1046,7 @@ with tab_B:
 <div class="mode-note">
   <strong>{selected_b_mode['label']}</strong>: threshold {selected_b_mode['threshold']*100:.1f}% | validated recall {selected_b_mode['recall']*100:.1f}% | specificity {selected_b_mode['specificity']*100:.1f}%.
   Risk bands (low/moderate/high) show absolute risk, while the operating point determines whether the patient is considered screen positive.
+  Recall here means the percentage of future CKD cases this threshold successfully catches, while specificity means the percentage of non-CKD patients it correctly leaves unflagged. The screening setting uses a lower cutoff so fewer high-risk patients are missed, even though that can create more false positives.
 </div>
 """,
         unsafe_allow_html=True,
@@ -979,4 +1137,4 @@ with tab_B:
             fig, ferr = shap_waterfall_fig(explainer_B, model_B, x_in, feats_B, x_t=x_t)
             _render_drivers_and_shap(drivers, derr, fig, ferr)
         else:
-            st.markdown('<div style="background:white;border-radius:10px;padding:3rem 2rem;text-align:center;color:#9DA8B5;margin-top:2rem;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:1rem;font-weight:600;">Enter patient values and click Predict</div><div style="font-size:0.85rem;margin-top:0.5rem">Risk score, uncertainty interval, and SHAP explanation will appear here</div></div>', unsafe_allow_html=True)
+            st.markdown('<div style="background:white;border-radius:10px;padding:3rem 2rem;text-align:center;color:#4F5B66;margin-top:2rem;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:1rem;font-weight:600;color:#4F5B66;">Enter patient values and click Predict</div><div style="font-size:0.85rem;margin-top:0.5rem;color:#6C757D;">Risk score, uncertainty interval, and SHAP explanation will appear here</div></div>', unsafe_allow_html=True)
