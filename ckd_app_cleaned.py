@@ -667,29 +667,8 @@ def _extract_base_value(explainer, shap_out):
     return float(ev_arr.ravel()[1] if ev_arr.size > 1 else ev_arr.ravel()[0])
 
 
-def predict_with_ci(model, x_input):
-    prob = float(model.predict_proba(x_input)[0, 1])
-    clf = model.named_steps["clf"]
-
-    if not hasattr(clf, "estimators_"):
-        prob = float(np.clip(prob, 0.0, 1.0))
-        return prob, prob, prob
-
-    x_t = _safe_transform(model, x_input)
-    tree_probs = [float(tree.predict_proba(x_t)[0, 1]) for tree in clf.estimators_]
-    if not tree_probs:
-        prob = float(np.clip(prob, 0.0, 1.0))
-        return prob, prob, prob
-
-    tree_arr = np.asarray(tree_probs, dtype=float)
-    ci_low = float(np.percentile(tree_arr, 2.5))
-    ci_high = float(np.percentile(tree_arr, 97.5))
-    prob = float(np.clip(prob, 0.0, 1.0))
-    ci_low = float(np.clip(ci_low, 0.0, 1.0))
-    ci_high = float(np.clip(ci_high, 0.0, 1.0))
-    if ci_low > ci_high:
-        ci_low, ci_high = ci_high, ci_low
-    return prob, ci_low, ci_high
+def predict_prob(model, x_input):
+    return float(np.clip(model.predict_proba(x_input)[0, 1], 0.0, 1.0))
 
 
 def risk_category(prob):
@@ -771,7 +750,7 @@ def _to_model_input(data_dict, feature_order):
     return x[feature_order]
 
 
-def _render_risk(prob, ci_low, ci_high, category, css_class, emoji_html):
+def _render_risk(prob, category, css_class, emoji_html):
     action = {
         "Low": "Routine annual monitoring recommended.",
         "Moderate": "Increased surveillance - 6-month nephrology review recommended.",
@@ -782,9 +761,6 @@ def _render_risk(prob, ci_low, ci_high, category, css_class, emoji_html):
 <div class="{css_class}">
   <div class="risk-title" style="color:#1F2933 !important;">{emoji_html} {category} Risk</div>
   <div class="risk-prob" style="color:#1F2933 !important;">{prob*100:.1f}%</div>
-  <div class="risk-ci" style="color:#1F2933 !important;">95% CI: {ci_low*100:.1f}% - {ci_high*100:.1f}%
-    <span title="Estimated from variation across all RF trees. Wider interval indicates higher uncertainty for this input profile." style="cursor:help;margin-left:4px;opacity:0.75">&#9432;</span>
-  </div>
   <div class="risk-action" style="color:#1F2933 !important;">{action}</div>
 </div>
 """,
@@ -1008,14 +984,14 @@ with tab_A:
             }
             try:
                 x_in = _to_model_input(input_dict, feats_A)
-                prob, ci_low, ci_high = predict_with_ci(model_A, x_in)
+                prob = predict_prob(model_A, x_in)
                 cat, css, emoji = risk_category(prob)
                 x_t = _safe_transform(model_A, x_in)
             except Exception as exc:
                 st.error(f"Prediction failed for Model A: {type(exc).__name__}: {exc}")
                 st.stop()
 
-            _render_risk(prob, ci_low, ci_high, cat, css, emoji)
+            _render_risk(prob, cat, css, emoji)
             drivers, derr = get_shap_drivers(explainer_A, model_A, x_in, feats_A, x_t=x_t)
             fig, ferr = shap_waterfall_fig(explainer_A, model_A, x_in, feats_A, x_t=x_t)
             _render_drivers_and_shap(drivers, derr, fig, ferr)
@@ -1124,14 +1100,14 @@ with tab_B:
             }
             try:
                 x_in = _to_model_input(input_dict, feats_B)
-                prob, ci_low, ci_high = predict_with_ci(model_B, x_in)
+                prob = predict_prob(model_B, x_in)
                 cat, css, emoji = risk_category(prob)
                 x_t = _safe_transform(model_B, x_in)
             except Exception as exc:
                 st.error(f"Prediction failed for Model B: {type(exc).__name__}: {exc}")
                 st.stop()
 
-            _render_risk(prob, ci_low, ci_high, cat, css, emoji)
+            _render_risk(prob, cat, css, emoji)
             _render_operating_point_call(prob, selected_b_mode_key, selected_b_mode)
             drivers, derr = get_shap_drivers(explainer_B, model_B, x_in, feats_B, x_t=x_t)
             fig, ferr = shap_waterfall_fig(explainer_B, model_B, x_in, feats_B, x_t=x_t)
